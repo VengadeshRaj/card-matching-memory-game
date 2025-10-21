@@ -12,3 +12,6 @@ The number of cards is displayed based on the player’s selected size. When the
 
 - React JS
 - Tailwind CSS
+
+## To play:
+https://card-matching-memory-game.onrender.com/
