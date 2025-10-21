@@ -15,6 +15,7 @@ const FindPairCard = () => {
   }, [selectedSize]);
 
   const buildHiddenNumbers = () => {
+    setTotalFlips(0)
     const lastNumber = (Number(selectedSize) * Number(selectedSize)) / 2;
     const numbers = [];
     for (let i = 1; i < lastNumber + 1; i++) {
