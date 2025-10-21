@@ -2,7 +2,7 @@ import React, { ReactNode, useState } from "react";
 
 type CardProps = {
   index: number;
-  onClick: (index: number, cardNumber: number) => void;
+  onClick: (index: number, cardNumber: number,action:'open'|'close') => void;
   cardNumber: any;
   isRevealed: boolean;
   isFrozen: boolean;
@@ -20,9 +20,11 @@ const Card = (props: CardProps) => {
     );
   }
   return (
-    <div onClick={() => onClick(index, cardNumber)} className="cursor-pointer">
-      {isRevealed || isFrozen ? (
-        <div className="relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-cyan-500 to-blue-500 group-hover:from-cyan-500 group-hover:to-blue-500 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-cyan-200 dark:focus:ring-cyan-800 w-24 h-24">
+    <div className="cursor-pointer">
+      {isRevealed ? (
+        <div 
+        onClick={() => onClick(index, cardNumber,'close')} 
+        className="relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-cyan-500 to-blue-500 group-hover:from-cyan-500 group-hover:to-blue-500 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-cyan-200 dark:focus:ring-cyan-800 w-24 h-24">
           <span className="relative px-5 py-2.5 transition-all ease-in duration-75 rounded-md font-bold text-4xl">
             {cardNumber}
           </span>
@@ -31,6 +33,7 @@ const Card = (props: CardProps) => {
         <div
           id="card"
           className="text-white bg-gradient-to-br from-green-400 to-blue-600 hover:bg-gradient-to-bl font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2 w-24 h-24"
+           onClick={() => onClick(index, cardNumber,'open')} 
         />
       )}
     </div>

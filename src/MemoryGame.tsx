@@ -24,47 +24,59 @@ const MemoryGame = () => {
       ...numbers.map((n) => ({ ...n })),
     ]);
     setCardValues(result);
+    setPreviousCard({});
   };
 
-  const cardOnClick = (index: number, cardNumber: number) => {
-    const noOfSelectedCard = cardValues.filter((card: any) => card.isRevealed);
-    let updateCardValues = [];
-    if (noOfSelectedCard.length == 2 || 0) {
-      setPreviousCard({
-        cardNumber: cardNumber,
-        index: index,
-      });
-    }
-    if (noOfSelectedCard.length < 2) {
-      updateCardValues = cardValues.map((card: any, i: number) => {
-        if (i == index) {
-          if (card.isRevealed) {
-            card.isRevealed = false;
-          } else {
-            card.isRevealed = true;
-            if(previousCard?.cardNumber == cardNumber){
-                 card.isFrozen = true;
+  const cardClick = (
+    cardIndex: number,
+    cardNumber: number,
+    action: "open" | "close"
+  ) => {
+    const newCardValues = [];
+    const preRevealedCards = cardValues.filter((card: any) => card.isRevealed);
+
+    // No card open or one card is open status
+    if (preRevealedCards.length < 2) {
+      // Check previous open card has same number
+      const isPairCards =
+        preRevealedCards.length &&
+        preRevealedCards[0].hiddenNumber == cardNumber;
+
+      // Same pair found flow
+      if (isPairCards && action == "open") {
+        for (let i = 0; i < cardValues.length; i++) {
+          const card = cardValues[i];
+          // Freezing the opened cards
+          if (cardNumber == card.hiddenNumber) card.isFrozen = true;
+          // Resetting the opened card status
+          card.isRevealed = false;
+          newCardValues.push(card);
+        }
+      } else {
+        for (let i = 0; i < cardValues.length; i++) {
+          const card = cardValues[i];
+          if (i == cardIndex) {
+            if (action == "open") {
+              card.isRevealed = true;
+            } else {
+              card.isRevealed = false;
             }
           }
-          return card;
-        } else return card;
-      });
-    } else {
-      updateCardValues = cardValues.map((card: any, i: number) => {
-        if (i == index) {
-          if (card.isRevealed) {
-            card.isRevealed = false;
-          } else {
-            card.isRevealed = true;
-          }
-          return card;
-        } else {
-          card.isRevealed = false;
-          return card;
+          newCardValues.push(card);
         }
-      });
+      }
+    } else {
+      for (let i = 0; i < cardValues.length; i++) {
+        const card = cardValues[i];
+        if (i == cardIndex) {
+          if (action == "open") {
+            card.isRevealed = true;
+          } else card.isRevealed = false;
+        } else card.isRevealed = false;
+        newCardValues.push(card);
+      }
     }
-    setCardValues([...updateCardValues]);
+    setCardValues([...newCardValues]);
   };
 
   const buildCard = () => {
@@ -73,13 +85,12 @@ const MemoryGame = () => {
 
     for (let i = 0; i < cardValues.length; i++) {
       const rowDeadLine = !((i + 1) % Number(selectedSize));
-      console.log("index", i);
       cardEle.push(
         <Card
           index={i}
           isRevealed={cardValues[i].isRevealed}
-          onClick={(cardIndex, cardNumber) =>
-            cardOnClick(cardIndex, cardNumber)
+          onClick={(cardIndex, cardNumber, action) =>
+            cardClick(cardIndex, cardNumber, action)
           }
           cardNumber={cardValues[i].hiddenNumber}
           isFrozen={cardValues[i].isFrozen}
@@ -91,7 +102,6 @@ const MemoryGame = () => {
         cardEle = [];
       }
     }
-    console.log("cardRow", cardRow);
     return cardRow;
   };
 
@@ -105,7 +115,11 @@ const MemoryGame = () => {
   };
 
   const buildSizeOptions = () =>
-    SIZE.map((s) => <option value={s} className="">{s}</option>);
+    SIZE.map((s) => (
+      <option value={s} className="">
+        {s}
+      </option>
+    ));
 
   return (
     <div className="flex flex-col items-center gap-4 bg-white dark:bg-gray-900 min-h-screen p-8">
@@ -118,9 +132,11 @@ const MemoryGame = () => {
         <span className="lg:text-5xl">🧐</span>
       </div>
       <CardContainer>{buildCard()}</CardContainer>
-      <div className="flex justify-evenly" style={{"width":"380px"}}>
+      <div className="flex justify-evenly" style={{ width: "380px" }}>
         <div>
-          <label className="text-transparent bg-clip-text bg-gradient-to-r to-emerald-600 from-sky-400 font-bold text-2xl">Size : </label>
+          <label className="text-transparent bg-clip-text bg-gradient-to-r to-emerald-600 from-sky-400 font-bold text-2xl">
+            Size :{" "}
+          </label>
           <select
             defaultValue={selectedSize}
             onChange={(e) => setSelectedSize(e.target.value)}
