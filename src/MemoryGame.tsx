@@ -7,7 +7,8 @@ const MemoryGame = () => {
   const SIZE = [2, 4, 6, 8, 10];
   const [selectedSize, setSelectedSize] = useState("2");
   const [cardValues, setCardValues] = useState<any>([]);
-  const [previousCard, setPreviousCard] = useState<any>();
+  const [toltalFlips, setTotalFlips] = useState(0);
+  const isGameComplete = cardValues.every((card: any) => card.isFrozen);
 
   useEffect(() => {
     buildHiddenNumbers();
@@ -24,7 +25,6 @@ const MemoryGame = () => {
       ...numbers.map((n) => ({ ...n })),
     ]);
     setCardValues(result);
-    setPreviousCard({});
   };
 
   const cardClick = (
@@ -44,6 +44,7 @@ const MemoryGame = () => {
 
       // Same pair found flow
       if (isPairCards && action == "open") {
+        setTotalFlips((prev) => prev + 1);
         for (let i = 0; i < cardValues.length; i++) {
           const card = cardValues[i];
           // Freezing the opened cards
@@ -57,6 +58,7 @@ const MemoryGame = () => {
           const card = cardValues[i];
           if (i == cardIndex) {
             if (action == "open") {
+              setTotalFlips((prev) => prev + 1);
               card.isRevealed = true;
             } else {
               card.isRevealed = false;
@@ -70,6 +72,7 @@ const MemoryGame = () => {
         const card = cardValues[i];
         if (i == cardIndex) {
           if (action == "open") {
+            setTotalFlips((prev) => prev + 1);
             card.isRevealed = true;
           } else card.isRevealed = false;
         } else card.isRevealed = false;
@@ -132,26 +135,52 @@ const MemoryGame = () => {
         <span className="lg:text-5xl">🧐</span>
       </div>
       <CardContainer>{buildCard()}</CardContainer>
-      <div className="flex justify-evenly" style={{ width: "380px" }}>
-        <div>
-          <label className="text-transparent bg-clip-text bg-gradient-to-r to-emerald-600 from-sky-400 font-bold text-2xl">
-            Size :{" "}
-          </label>
-          <select
-            defaultValue={selectedSize}
-            onChange={(e) => setSelectedSize(e.target.value)}
-            className="text-white bg-gradient-to-r from-purple-500 via-purple-600 to-purple-700 hover:bg-gradient-to-br focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 shadow-lg shadow-purple-500/50 dark:shadow-lg dark:shadow-purple-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2 w-24"
+      {isGameComplete ? (
+        <div className="flex flex-col items-center">
+          <div className="flex">
+            <h1 className="animate-bounce animate-bounce bg-gradient-to-r from-cyan-500 to-blue-500 bg-clip-text text-transparent rounded-lg py-2.5 text-center text-2xl font-black">
+              Congratulations!
+            </h1>
+            <span className="lg:text-3xl animate-bounce">🎊</span>
+          </div>
+          <div className="flex">
+            <h1 className="animate-bounce animate-bounce bg-gradient-to-r from-cyan-500 to-blue-500 bg-clip-text text-transparent rounded-lg py-2.5 text-cente text-2xl font-black">
+              You Won!
+            </h1>
+            <span className="lg:text-3xl animate-bounce">🎉</span>
+          </div>
+          <h1 className="text-white  py-3 text-2xl font-bold">
+            No of card flips : {toltalFlips}
+          </h1>
+          <button
+            className="text-white bg-gradient-to-br from-purple-600 to-blue-500 hover:bg-gradient-to-bl focus:outline-none font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
+            onClick={() => buildHiddenNumbers()}
           >
-            {buildSizeOptions()}
-          </select>
+            Play Again!
+          </button>
         </div>
-        <button
-          className="text-white bg-gradient-to-r from-purple-500 via-purple-600 to-purple-700 hover:bg-gradient-to-br focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 shadow-lg shadow-purple-500/50 dark:shadow-lg dark:shadow-purple-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
-          onClick={() => buildHiddenNumbers()}
-        >
-          Reset Game
-        </button>
-      </div>
+      ) : (
+        <div className="flex justify-evenly" style={{ width: "320px" }}>
+          <div>
+            <label className="text-transparent bg-clip-text bg-gradient-to-r to-emerald-600 from-sky-400 font-bold text-2xl">
+              Size :{" "}
+            </label>
+            <select
+              defaultValue={selectedSize}
+              onChange={(e) => setSelectedSize(e.target.value)}
+              className="p-2 rounded-lg border border-gray-300 bg-black text-white focus:ring-2 focus:ring-blue-400 w-24"
+            >
+              {buildSizeOptions()}
+            </select>
+          </div>
+          <button
+            className="text-white bg-gradient-to-br from-purple-600 to-blue-500 hover:bg-gradient-to-bl focus:outline-none font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
+            onClick={() => buildHiddenNumbers()}
+          >
+            Reset Game
+          </button>
+        </div>
+      )}
     </div>
   );
 };
